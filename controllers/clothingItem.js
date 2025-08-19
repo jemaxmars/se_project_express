@@ -24,7 +24,7 @@ const getItems = (req, res) => {
 const createItem = (req, res) => {
   console.log(req.body);
   const { name, weather, imageUrl } = req.body;
-  //using temporary value for now
+  // using temporary value for now
   const owner = "507f1f77bcf86cd799439011"; // temp user ID
 
   ClothingItem.create({ name, weather, imageUrl, owner })
@@ -38,11 +38,10 @@ const createItem = (req, res) => {
       );
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: err.message });
-      } else {
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
       }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
 
@@ -61,15 +60,15 @@ const deleteItem = (req, res) => {
         return res
           .status(NOT_FOUND)
           .send({ message: ERROR_MESSAGES.ITEM_NOT_FOUND });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: ERROR_MESSAGES.INVALID_ITEM_ID });
-      } else {
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
       }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
 
@@ -94,15 +93,15 @@ const likeItem = (req, res) => {
         return res
           .status(NOT_FOUND)
           .send({ message: ERROR_MESSAGES.ITEM_NOT_FOUND });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: ERROR_MESSAGES.INVALID_ITEM_ID });
-      } else {
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
       }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
 
@@ -127,15 +126,15 @@ const dislikeItem = (req, res) => {
         return res
           .status(NOT_FOUND)
           .send({ message: ERROR_MESSAGES.ITEM_NOT_FOUND });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: ERROR_MESSAGES.INVALID_ITEM_ID });
-      } else {
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
       }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
 

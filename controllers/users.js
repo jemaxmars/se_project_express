@@ -32,11 +32,10 @@ const createUser = (req, res) => {
       );
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: err.message });
-      } else {
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
       }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
 
@@ -53,15 +52,15 @@ const getUser = (req, res) => {
         return res
           .status(NOT_FOUND)
           .send({ message: ERROR_MESSAGES.USER_NOT_FOUND });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: ERROR_MESSAGES.INVALID_USER_ID });
-      } else {
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
       }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
 
