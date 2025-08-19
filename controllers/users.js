@@ -1,27 +1,42 @@
 const User = require("../models/user");
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+  ERROR_MESSAGES,
+} = require("../utils/errors");
 
 // GET USERS
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
     .catch((err) => {
-      console.error(err);
-      return res.status(500).send({ message: err.message });
+      console.error(
+        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
+      );
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
 
-// POST USER
+// CREATE USER
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
 
   User.create({ name, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      console.error(err);
+      console.error(
+        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
+      );
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: err.message });
+        return res.status(BAD_REQUEST).send({ message: err.message });
+      } else {
+        return res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
       }
-      return res.status(500).send({ message: err.message });
     });
 };
 
@@ -31,13 +46,21 @@ const getUser = (req, res) => {
     .orFail()
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      console.error(err);
+      console.error(
+        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
+      );
       if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: "User not found" });
+        return res
+          .status(NOT_FOUND)
+          .send({ message: ERROR_MESSAGES.USER_NOT_FOUND });
       } else if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid user ID format" });
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: ERROR_MESSAGES.INVALID_USER_ID });
       } else {
-        return res.status(500).send({ message: err.message });
+        return res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
       }
     });
 };
