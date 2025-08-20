@@ -2,7 +2,7 @@ const User = require("../models/user");
 const {
   BAD_REQUEST,
   NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
+  SERVER_ERROR,
   ERROR_MESSAGES,
 } = require("../utils/errors");
 
@@ -15,7 +15,7 @@ const getUsers = (req, res) => {
         `Error ${err.name} with the message ${err.message} has occurred while executing the code`
       );
       return res
-        .status(INTERNAL_SERVER_ERROR)
+        .status(SERVER_ERROR)
         .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
@@ -31,10 +31,10 @@ const createUser = (req, res) => {
         `Error ${err.name} with the message ${err.message} has occurred while executing the code`
       );
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
+        return res.status(BAD_REQUEST).send({ message: "An error has occurred on the server." });
       }
       return res
-        .status(INTERNAL_SERVER_ERROR)
+        .status(SERVER_ERROR)
         .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
@@ -59,7 +59,7 @@ const getUser = (req, res) => {
           .send({ message: ERROR_MESSAGES.INVALID_USER_ID });
       }
       return res
-        .status(INTERNAL_SERVER_ERROR)
+        .status(SERVER_ERROR)
         .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
