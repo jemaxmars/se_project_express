@@ -6,7 +6,7 @@ const {
   ERROR_MESSAGES,
 } = require("../utils/errors");
 
-// GET USERS - Updated Aug 20, 2025
+// GET USERS - Updated Aug 20, 2025 - ESLint verified clean
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))

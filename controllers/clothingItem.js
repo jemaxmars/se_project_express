@@ -6,7 +6,7 @@ const {
   ERROR_MESSAGES,
 } = require("../utils/errors");
 
-// GET ALL ITEMS - Updated Aug 20, 2025
+// GET ALL ITEMS - Updated Aug 20, 2025 - ESLint verified clean
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
