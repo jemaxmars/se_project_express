@@ -6,7 +6,7 @@ const {
   ERROR_MESSAGES,
 } = require("../utils/errors");
 
-// GET ALL ITEMS - Updated Aug 20, 2025 - ESLint verified clean
+// GET ALL ITEMS
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
@@ -22,14 +22,11 @@ const getItems = (req, res) => {
 
 // CREATE ITEM
 const createItem = (req, res) => {
-  console.log(req.body);
   const { name, weather, imageUrl } = req.body;
-  // using temporary value for now
-  const owner = "507f1f77bcf86cd799439011"; // temp user ID
+  const owner = req.user._id; // Use authenticated user's ID
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
-      console.log(item);
       res.status(201).send(item);
     })
     .catch((err) => {
@@ -75,8 +72,7 @@ const deleteItem = (req, res) => {
 // LIKE ITEM
 const likeItem = (req, res) => {
   const { itemId } = req.params;
-  // TODO: Replace with actual user ID from req.user._id when authentication is implemented
-  const userId = "507f1f77bcf86cd799439011"; // Temporary user ID
+  const userId = req.user._id; // Use authenticated user's ID
 
   ClothingItem.findByIdAndUpdate(
     itemId,
@@ -108,8 +104,7 @@ const likeItem = (req, res) => {
 // UNLIKE ITEM
 const dislikeItem = (req, res) => {
   const { itemId } = req.params;
-  // TODO: Replace with actual user ID from req.user._id when authentication is implemented
-  const userId = "507f1f77bcf86cd799439011"; // Temporary user ID
+  const userId = req.user._id; // Use authenticated user's ID
 
   ClothingItem.findByIdAndUpdate(
     itemId,
