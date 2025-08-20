@@ -6,7 +6,7 @@ const {
   ERROR_MESSAGES,
 } = require("../utils/errors");
 
-// GET ALL ITEMS
+// GET ALL ITEMS - Updated Aug 20, 2025
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
