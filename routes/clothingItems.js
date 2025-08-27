@@ -4,9 +4,10 @@ const {
   createItem,
   deleteItem,
 } = require("../controllers/clothingItems");
+const auth = require("../middlewares/auth");
 
-router.get("/", getItems);
-router.post("/", createItem);
-router.delete("/:itemId", deleteItem);
+router.get("/", getItems);                    // Public - no auth needed
+router.post("/", auth, createItem);           // Protected - needs auth
+router.delete("/:itemId", auth, deleteItem);  // Protected - needs auth
 
 module.exports = router;

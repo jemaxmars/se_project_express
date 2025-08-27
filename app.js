@@ -6,7 +6,7 @@ const mainRouter = require("./routes/index");
 const { createUser, loginUser } = require("./controllers/users");
 
 const app = express();
-const { PORT = 3002 } = process.env;
+const { PORT = 3000 } = process.env;
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
@@ -16,14 +16,6 @@ mongoose
   .catch(console.error);
 
 app.use(express.json());
-
-// Temporary middleware to simulate authentication
-app.use((req, res, next) => {
-  req.user = {
-    _id: "5d8b8592978f8bd833ca8133", // Hardcoded user ID
-  };
-  next();
-});
 
 // Add these routes
 app.post("/signin", loginUser);

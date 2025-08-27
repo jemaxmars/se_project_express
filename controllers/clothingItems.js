@@ -1,4 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
+const auth = require("../middlewares/auth");
 
 // GET /items - Get all clothing items
 const getItems = (req, res) => {
