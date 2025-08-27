@@ -1,6 +1,5 @@
-const User = require("../models/user");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST,
@@ -42,11 +41,11 @@ const createUser = (req, res) => {
   }
 
   // Create user (password will be hashed by the pre-save hook)
-  User.create({ name, avatar, email, password })
+  return User.create({ name, avatar, email, password })
     .then((user) => {
       const { password: userPassword, ...userWithoutPassword } =
         user.toObject();
-      res.status(201).json(userWithoutPassword);
+      return res.status(201).json(userWithoutPassword);
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -71,7 +70,7 @@ const loginUser = (req, res) => {
       .json({ message: "Email and password are required" });
   }
 
-  User.findUserByCredentials(email, password) // Use custom method
+  return User.findUserByCredentials(email, password) // Use custom method
     .then((user) => {
       // Create JWT token
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -79,7 +78,7 @@ const loginUser = (req, res) => {
       });
 
       // Send token to client
-      res.json({ token });
+      return res.json({ token });
     })
     .catch((err) => {
       if (err.name === "SomeSpecificError") {

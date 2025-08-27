@@ -35,17 +35,17 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function hashPassword(next) {
   // Only hash the password if it has been modified (or is new)
   if (!this.isModified("password")) return next();
 
   // Hash password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
-  next();
+  return next();
 });
 
 // This will be a static method added to your userSchema
-userSchema.statics.findUserByCredentials = function (email, password) {
+userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password) {
   // 1. Find user by email AND include password field
   // 2. Check if user exists
   // 3. Compare provided password with stored hash

@@ -1,5 +1,4 @@
 const ClothingItem = require("../models/clothingItem");
-const auth = require("../middlewares/auth");
 
 // GET /items - Get all clothing items
 const getItems = (req, res) => {
@@ -14,8 +13,7 @@ const getItems = (req, res) => {
 // POST /items - Create new clothing item
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  // TODO: Get owner from req.user (next step)
-  const owner = "temp-user-id"; // Temporary placeholder
+  const owner = req.user._id; // Get owner from authenticated user
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
@@ -39,11 +37,11 @@ const deleteItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: "Item not found" });
-      } else if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid item ID format" });
-      } else {
-        return res.status(500).send({ message: err.message });
       }
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "Invalid item ID format" });
+      }
+      return res.status(500).send({ message: err.message });
     });
 };
 
