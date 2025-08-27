@@ -34,7 +34,9 @@ const createItem = (req, res) => {
         `Error ${err.name} with the message ${err.message} has occurred while executing the code`
       );
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: "An error has occurred on the server." });
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "An error has occurred on the server." });
       }
       return res
         .status(SERVER_ERROR)

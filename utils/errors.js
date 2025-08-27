@@ -1,23 +1,23 @@
-// HTTP Status Codes
 const BAD_REQUEST = 400;
+const UNAUTHORIZED = 401;
 const NOT_FOUND = 404;
+const CONFLICT = 409;
 const SERVER_ERROR = 500;
 
-// Error Messages
 const ERROR_MESSAGES = {
-  VALIDATION_ERROR: "Validation failed",
-  CAST_ERROR: "Invalid ID format",
-  DOCUMENT_NOT_FOUND: "Requested resource not found",
+  INTERNAL_ERROR: "An error has occurred on the server",
   USER_NOT_FOUND: "User not found",
+  INVALID_USER_ID: "Invalid user ID",
   ITEM_NOT_FOUND: "Item not found",
-  INVALID_USER_ID: "Invalid user ID format",
-  INVALID_ITEM_ID: "Invalid item ID format",
-  INTERNAL_ERROR: "An error occurred on the server",
+  INVALID_ITEM_ID: "Invalid item ID",
+  FORBIDDEN: "You are not authorized to perform this action",
 };
 
 module.exports = {
   BAD_REQUEST,
+  UNAUTHORIZED,
   NOT_FOUND,
+  CONFLICT,
   SERVER_ERROR,
   ERROR_MESSAGES,
 };
