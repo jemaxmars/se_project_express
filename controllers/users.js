@@ -3,14 +3,12 @@ const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST,
-  NOT_FOUND,
   SERVER_ERROR,
   CONFLICT,
   UNAUTHORIZED,
   ERROR_MESSAGES,
 } = require("../utils/errors");
 
-// GET USERS
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -24,26 +22,21 @@ const getUsers = (req, res) => {
     });
 };
 
-// CREATE USER (SIGNUP)
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  // Check if all required fields are provided
   if (!name || !avatar || !email || !password) {
     return res.status(BAD_REQUEST).json({ message: "All fields are required" });
   }
 
-  // Check password length
   if (password.length < 8) {
     return res
       .status(BAD_REQUEST)
       .json({ message: "Password must be at least 8 characters" });
   }
 
-  // Create user (password will be hashed by the pre-save hook)
   return User.create({ name, avatar, email, password })
     .then((user) => {
-      // Convert to object and delete password
       const userObject = user.toObject();
       delete userObject.password;
       return res.status(201).json(userObject);
@@ -61,7 +54,6 @@ const createUser = (req, res) => {
     });
 };
 
-// LOGIN USER (SIGNIN)
 const loginUser = (req, res) => {
   const { email, password } = req.body;
 
@@ -71,14 +63,12 @@ const loginUser = (req, res) => {
       .json({ message: "Email and password are required" });
   }
 
-  return User.findUserByCredentials(email, password) // Use custom method
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      // Create JWT token
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
 
-      // Send token to client
       return res.json({ token });
     })
     .catch((err) => {
@@ -101,11 +91,11 @@ const getCurrentUser = (req, res) => {
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      res.json(user);
+      return res.json(user);
     })
     .catch((err) => {
       console.error("Error fetching user:", err);
-      res
+      return res
         .status(500)
         .json({ message: "An error occurred while fetching user" });
     });
@@ -113,7 +103,7 @@ const getCurrentUser = (req, res) => {
 
 const updateCurrentUser = (req, res) => {
   const userId = req.user._id;
-  const { name, avatar } = req.body; // Only extract allowed fields
+  const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(
     userId,
@@ -124,7 +114,7 @@ const updateCurrentUser = (req, res) => {
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      res.json(user);
+      return res.json(user);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -134,7 +124,7 @@ const updateCurrentUser = (req, res) => {
         return res.status(400).json({ message: "Invalid user ID" });
       }
       console.error("Error updating user:", err);
-      res
+      return res
         .status(500)
         .json({ message: "An error occurred while updating user" });
     });

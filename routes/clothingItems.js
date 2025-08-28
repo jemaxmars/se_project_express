@@ -5,13 +5,13 @@ const {
   deleteItem,
   likeItem,
   dislikeItem,
-} = require("../controllers/clothingItem"); // Note: singular 'clothingItem'
+} = require("../controllers/clothingItems");
 const auth = require("../middlewares/auth");
 
-router.get("/", getItems); // Public - no auth needed
-router.post("/", auth, createItem); // Protected - needs auth
-router.delete("/:itemId", auth, deleteItem); // Protected - needs auth
-router.put("/:itemId/likes", auth, likeItem); // Protected - needs auth
-router.delete("/:itemId/likes", auth, dislikeItem); // Protected - needs auth
+router.get("/", getItems);
+router.post("/", auth, createItem);
+router.delete("/:itemId", auth, deleteItem);
+router.put("/:itemId/likes", auth, likeItem);
+router.delete("/:itemId/likes", auth, dislikeItem);
 
 module.exports = router;
