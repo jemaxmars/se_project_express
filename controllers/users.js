@@ -43,9 +43,10 @@ const createUser = (req, res) => {
   // Create user (password will be hashed by the pre-save hook)
   return User.create({ name, avatar, email, password })
     .then((user) => {
-      const { password: userPassword, ...userWithoutPassword } =
-        user.toObject();
-      return res.status(201).json(userWithoutPassword);
+      // Convert to object and delete password
+      const userObject = user.toObject();
+      delete userObject.password;
+      return res.status(201).json(userObject);
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -93,28 +94,56 @@ const loginUser = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const userId = req.user._id; // CHANGED FROM req.params
+  const userId = req.user._id;
+
   User.findById(userId)
-    .orFail()
-    .then((user) => res.status(200).send(user))
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    })
     .catch((err) => {
-      console.error(
-        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
-      );
-      if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: ERROR_MESSAGES.USER_NOT_FOUND });
-      }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: ERROR_MESSAGES.INVALID_USER_ID });
-      }
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
+      console.error("Error fetching user:", err);
+      res
+        .status(500)
+        .json({ message: "An error occurred while fetching user" });
     });
 };
 
-module.exports = { getUsers, createUser, getCurrentUser, loginUser };
+const updateCurrentUser = (req, res) => {
+  const userId = req.user._id;
+  const { name, avatar } = req.body; // Only extract allowed fields
+
+  User.findByIdAndUpdate(
+    userId,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(400).json({ message: err.message });
+      }
+      if (err.name === "CastError") {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      console.error("Error updating user:", err);
+      res
+        .status(500)
+        .json({ message: "An error occurred while updating user" });
+    });
+};
+
+module.exports = {
+  getUsers,
+  createUser,
+  getCurrentUser,
+  loginUser,
+  updateCurrentUser,
+};
