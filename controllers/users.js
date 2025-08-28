@@ -82,9 +82,13 @@ const loginUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "SomeSpecificError") {
-        return res.status(UNAUTHORIZED).json({ message: "Invalid email or password" });
+        return res
+          .status(UNAUTHORIZED)
+          .json({ message: "Invalid email or password" });
       }
-      return res.status(SERVER_ERROR).send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
+      return res
+        .status(SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
     });
 };
 

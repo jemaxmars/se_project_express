@@ -1,7 +1,9 @@
 const router = require("express").Router();
+const { getUsers, createUser, getUser } = require("../controllers/users");
 
-// All user routes have been moved to app.js or will be replaced with authenticated routes
-// POST /signup and POST /signin are now handled at the main app level
-// GET routes for users are removed for security - users should not access other profiles
+// User routes
+router.get("/", getUsers); // GET /users - get all users
+router.get("/:userId", getUser); // GET /users/:userId - get user by ID
+router.post("/", createUser); // POST /users - create user (signup)
 
 module.exports = router;

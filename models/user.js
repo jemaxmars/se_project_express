@@ -45,7 +45,10 @@ userSchema.pre("save", async function hashPassword(next) {
 });
 
 // This will be a static method added to your userSchema
-userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password) {
+userSchema.statics.findUserByCredentials = function findUserByCredentials(
+  email,
+  password
+) {
   // 1. Find user by email AND include password field
   // 2. Check if user exists
   // 3. Compare provided password with stored hash
