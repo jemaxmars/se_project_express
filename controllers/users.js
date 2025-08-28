@@ -3,24 +3,12 @@ const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST,
+  NOT_FOUND,
   SERVER_ERROR,
   CONFLICT,
   UNAUTHORIZED,
   ERROR_MESSAGES,
 } = require("../utils/errors");
-
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => {
-      console.error(
-        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
-      );
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
-    });
-};
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -92,14 +80,14 @@ const getCurrentUser = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(NOT_FOUND).json({ message: "User not found" });
       }
       return res.json(user);
     })
     .catch((err) => {
       console.error("Error fetching user:", err);
       return res
-        .status(500)
+        .status(SERVER_ERROR)
         .json({ message: "An error occurred while fetching user" });
     });
 };
@@ -115,26 +103,25 @@ const updateCurrentUser = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(NOT_FOUND).json({ message: "User not found" });
       }
       return res.json(user);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(400).json({ message: err.message });
+        return res.status(BAD_REQUEST).json({ message: err.message });
       }
       if (err.name === "CastError") {
-        return res.status(400).json({ message: "Invalid user ID" });
+        return res.status(BAD_REQUEST).json({ message: "Invalid user ID" });
       }
       console.error("Error updating user:", err);
       return res
-        .status(500)
+        .status(SERVER_ERROR)
         .json({ message: "An error occurred while updating user" });
     });
 };
 
 module.exports = {
-  getUsers,
   createUser,
   getCurrentUser,
   loginUser,

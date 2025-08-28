@@ -2,6 +2,7 @@ const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST,
   NOT_FOUND,
+  FORBIDDEN,
   SERVER_ERROR,
   ERROR_MESSAGES,
 } = require("../utils/errors");
@@ -34,7 +35,7 @@ const createItem = (req, res) => {
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST)
-          .send({ message: "An error has occurred on the server." });
+          .send({ message: "Invalid data" });
       }
       return res
         .status(SERVER_ERROR)
@@ -51,12 +52,12 @@ const deleteItem = (req, res) => {
     .then((item) => {
       if (!item.owner) {
         return res
-          .status(403)
+          .status(FORBIDDEN)
           .send({ message: "Cannot delete legacy item without owner" });
       }
 
       if (item.owner.toString() !== userId.toString()) {
-        return res.status(403).send({ message: "Access denied" });
+        return res.status(FORBIDDEN).send({ message: "Access denied" });
       }
 
       return ClothingItem.findByIdAndDelete(itemId).then(() =>
@@ -66,12 +67,12 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: "Item not found" });
+        return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid item ID format" });
+        return res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
