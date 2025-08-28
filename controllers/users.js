@@ -72,10 +72,13 @@ const loginUser = (req, res) => {
       return res.json({ token });
     })
     .catch((err) => {
-      if (err.name === "SomeSpecificError") {
+      if (err.message === "Incorrect email or password") {
         return res
           .status(UNAUTHORIZED)
-          .json({ message: "Invalid email or password" });
+          .json({ message: "Incorrect email or password" });
+      }
+      if (err.name === "ValidationError" || err.name === "CastError") {
+        return res.status(BAD_REQUEST).json({ message: "Invalid data" });
       }
       return res
         .status(SERVER_ERROR)
