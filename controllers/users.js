@@ -92,8 +92,8 @@ const loginUser = (req, res) => {
     });
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
+const getCurrentUser = (req, res) => {
+  const userId = req.user._id; // CHANGED FROM req.params
   User.findById(userId)
     .orFail()
     .then((user) => res.status(200).send(user))
@@ -117,4 +117,4 @@ const getUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser, loginUser };
+module.exports = { getUsers, createUser, getCurrentUser, loginUser };
