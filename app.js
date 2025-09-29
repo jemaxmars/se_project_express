@@ -11,7 +11,7 @@ const { PORT = 3001 } = process.env;
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => {
-    console.log("Connected to MongoDB");
+    ("Connected to MongoDB");
   })
   .catch(console.error);
 
@@ -24,5 +24,5 @@ app.post("/signup", createUser);
 app.use("/", mainRouter);
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is listening on port ${PORT}`);
+  `Server is listening on port ${PORT}`;
 });

@@ -3,7 +3,7 @@ const { JWT_SECRET } = require("../utils/config");
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
-  console.log("Authorization header:", req.headers.authorization);
+  "Authorization header:", req.headers.authorization;
 
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) {
