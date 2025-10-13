@@ -6,10 +6,13 @@ const {
   getCurrentUser,
   updateCurrentUser,
 } = require("../controllers/users");
+const {
+  validateCreateUser,
+  validateUserLogin,
+} = require("../middlewares/validation");
 
-router.post("/signup", createUser);
-
-router.post("/signin", loginUser);
+router.post("/signup", validateCreateUser, createUser);
+router.post("/signin", validateUserLogin, loginUser);
 
 const auth = require("../middlewares/auth");
 router.get("/me", auth, getCurrentUser);

@@ -1,26 +1,23 @@
 const ClothingItem = require("../models/clothingItem");
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  FORBIDDEN,
-  SERVER_ERROR,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  InternalServerError,
   ERROR_MESSAGES,
-} = require("../utils/errors");
+} = require("../middlewares/errorHandler"); // Get everything from errorHandler
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((err) => {
-      console.error(
-        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
-      );
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
+    .catch(() => {
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
 
@@ -29,21 +26,14 @@ const createItem = (req, res) => {
       res.status(201).send(item);
     })
     .catch((err) => {
-      console.error(
-        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
-      );
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid data" });
+        return next(new BadRequestError(ERROR_MESSAGES.INVALID_DATA));
       }
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
@@ -51,13 +41,11 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (!item.owner) {
-        return res
-          .status(FORBIDDEN)
-          .send({ message: "Cannot delete legacy item without owner" });
+        return next(new ForbiddenError(ERROR_MESSAGES.FORBIDDEN_DELETE));
       }
 
       if (item.owner.toString() !== userId.toString()) {
-        return res.status(FORBIDDEN).send({ message: "Access denied" });
+        return next(new ForbiddenError(ERROR_MESSAGES.ACCESS_DENIED));
       }
 
       return ClothingItem.findByIdAndDelete(itemId).then(() =>
@@ -65,49 +53,45 @@ const deleteItem = (req, res) => {
       );
     })
     .catch((err) => {
-      console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
+        return next(new NotFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND));
       }
       if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
+        return next(new BadRequestError(ERROR_MESSAGES.INVALID_ITEM_ID));
       }
-      return res.status(SERVER_ERROR).send({ message: err.message });
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  ClothingItem.findByIdAndUpdate(
-    itemId,
-    { $addToSet: { likes: userId } },
-    { new: true }
-  )
+  ClothingItem.findById(itemId)
     .orFail()
+    .then((item) => {
+      if (!item.owner) {
+        return next(new ForbiddenError(ERROR_MESSAGES.ITEM_UNAVAILABLE));
+      }
+      return ClothingItem.findByIdAndUpdate(
+        itemId,
+        { $addToSet: { likes: userId } },
+        { new: true }
+      );
+    })
     .then((item) => res.status(200).send(item))
     .catch((err) => {
-      console.error(
-        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
-      );
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: ERROR_MESSAGES.ITEM_NOT_FOUND });
+        return next(new NotFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND));
       }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: ERROR_MESSAGES.INVALID_ITEM_ID });
+        return next(new BadRequestError(ERROR_MESSAGES.INVALID_ITEM_ID));
       }
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
@@ -117,24 +101,20 @@ const dislikeItem = (req, res) => {
     { new: true }
   )
     .orFail()
-    .then((item) => res.status(200).send(item))
+    .then((item) => {
+      if (!item.owner) {
+        return next(new BadRequestError(ERROR_MESSAGES.ITEM_UNAVAILABLE));
+      }
+      res.status(200).send(item);
+    })
     .catch((err) => {
-      console.error(
-        `Error ${err.name} with the message ${err.message} has occurred while executing the code`
-      );
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: ERROR_MESSAGES.ITEM_NOT_FOUND });
+        return next(new NotFoundError(ERROR_MESSAGES.ITEM_NOT_FOUND));
       }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: ERROR_MESSAGES.INVALID_ITEM_ID });
+        return next(new BadRequestError(ERROR_MESSAGES.INVALID_ITEM_ID));
       }
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 

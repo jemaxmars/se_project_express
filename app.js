@@ -1,28 +1,33 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const mainRouter = require("./routes/index");
+const { errors } = require("celebrate"); 
 
-const { createUser, loginUser } = require("./controllers/users");
+const routes = require("./routes");
+const { errorHandler } = require("./middlewares/errorHandler");
 
 const app = express();
 const { PORT = 3001 } = process.env;
 
+// Connect to MongoDB
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => {
-    ("Connected to MongoDB");
-  })
-  .catch(console.error);
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
-app.use(express.json());
+// Middleware
 app.use(cors());
+app.use(express.json());
 
-app.post("/signin", loginUser);
-app.post("/signup", createUser);
+// Routes
+app.use(routes);
 
-app.use("/", mainRouter);
+// Celebrate error handler (MUST come before your custom error handler)
+app.use(errors());
 
-app.listen(PORT, "0.0.0.0", () => {
-  `Server is listening on port ${PORT}`;
+// Your centralized error handler
+app.use(errorHandler);
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

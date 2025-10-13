@@ -1,26 +1,25 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
+const { ERROR_MESSAGES } = require("../utils/errors");
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  SERVER_ERROR,
-  CONFLICT,
-  UNAUTHORIZED,
-  ERROR_MESSAGES,
-} = require("../utils/errors");
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  InternalServerError, // Added this
+} = require("../middlewares/errorHandler");
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   if (!name || !avatar || !email || !password) {
-    return res.status(BAD_REQUEST).json({ message: "All fields are required" });
+    return next(new BadRequestError(ERROR_MESSAGES.ALL_FIELDS_REQUIRED));
   }
 
   if (password.length < 8) {
-    return res
-      .status(BAD_REQUEST)
-      .json({ message: "Password must be at least 8 characters" });
+    return next(new BadRequestError(ERROR_MESSAGES.PASSWORD_TOO_SHORT));
   }
 
   return User.create({ name, avatar, email, password })
@@ -31,24 +30,20 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return res.status(CONFLICT).json({ message: "Email already exists" });
+        return next(new ConflictError(ERROR_MESSAGES.EMAIL_EXISTS));
       }
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+        return next(new BadRequestError(ERROR_MESSAGES.INVALID_DATA));
       }
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 
-const loginUser = (req, res) => {
+const loginUser = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(BAD_REQUEST)
-      .json({ message: "Email and password are required" });
+    return next(new BadRequestError(ERROR_MESSAGES.EMAIL_PASSWORD_REQUIRED));
   }
 
   return User.findUserByCredentials(email, password)
@@ -61,38 +56,33 @@ const loginUser = (req, res) => {
     })
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
-        return res
-          .status(UNAUTHORIZED)
-          .json({ message: "Incorrect email or password" });
+        return next(
+          new UnauthorizedError(ERROR_MESSAGES.INCORRECT_CREDENTIALS)
+        );
       }
       if (err.name === "ValidationError" || err.name === "CastError") {
-        return res.status(BAD_REQUEST).json({ message: "Invalid data" });
+        return next(new BadRequestError(ERROR_MESSAGES.INVALID_DATA));
       }
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.INTERNAL_ERROR });
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
 
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND).json({ message: "User not found" });
+        return next(new NotFoundError(ERROR_MESSAGES.USER_NOT_FOUND));
       }
       return res.json(user);
     })
-    .catch((err) => {
-      console.error("Error fetching user:", err);
-      return res
-        .status(SERVER_ERROR)
-        .json({ message: "An error occurred while fetching user" });
+    .catch(() => {
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 
-const updateCurrentUser = (req, res) => {
+const updateCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   const { name, avatar } = req.body;
 
@@ -103,21 +93,18 @@ const updateCurrentUser = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND).json({ message: "User not found" });
+        return next(new NotFoundError(ERROR_MESSAGES.USER_NOT_FOUND));
       }
       return res.json(user);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).json({ message: err.message });
+        return next(new BadRequestError(ERROR_MESSAGES.INVALID_DATA));
       }
       if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).json({ message: "Invalid user ID" });
+        return next(new BadRequestError(ERROR_MESSAGES.INVALID_USER_ID));
       }
-      console.error("Error updating user:", err);
-      return res
-        .status(SERVER_ERROR)
-        .json({ message: "An error occurred while updating user" });
+      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
     });
 };
 
