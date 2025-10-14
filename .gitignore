@@ -1,15 +1,25 @@
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 
-# Dependency directory
-node_modules
+# Dependencies
+node_modules/
 
 # Optional npm cache directory
 .npm
 
-# System files and IDE settings folders
+# Environment variables
+.env
+
+# OS generated files
 .DS_Store
-.idea
-.vscode
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/

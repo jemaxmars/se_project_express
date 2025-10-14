@@ -1,10 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { errors } = require("celebrate"); 
+const { errors } = require("celebrate");
 
 const routes = require("./routes");
 const { errorHandler } = require("./middlewares/errorHandler");
+const { requestLogger, errorLogger } = require("./middlewares/logger"); // Add this line here
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -19,13 +20,19 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
+// Request logging (before routes)
+app.use(requestLogger);
+
 // Routes
 app.use(routes);
 
-// Celebrate error handler (MUST come before your custom error handler)
+// Error logging (before error handlers)
+app.use(errorLogger);
+
+// Celebrate error handler (come before your custom error handler)
 app.use(errors());
 
-// Your centralized error handler
+//  centralized error handler
 app.use(errorHandler);
 
 app.listen(PORT, () => {
