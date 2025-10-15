@@ -1,13 +1,18 @@
 const router = require("express").Router();
-const userRouter = require("./users");
-const itemRouter = require("./clothingItems");
-const { NOT_FOUND, ERROR_MESSAGES } = require("../utils/errors");
+const userRoutes = require("./users");
+const itemRoutes = require("./clothingItems");
+const {
+  validateUserLogin,
+  validateCreateUser,
+} = require("../middlewares/validation"); // Add validateCreateUser
+const { loginUser, createUser } = require("../controllers/users"); // Add createUser
 
-router.use("/users", userRouter);
-router.use("/items", itemRouter);
+// Direct auth routes (no /users prefix)
+router.post("/signin", validateUserLogin, loginUser);
+router.post("/signup", validateCreateUser, createUser); // Now this will work
 
-router.use((req, res) => {
-  res.status(NOT_FOUND).send({ message: ERROR_MESSAGES.DOCUMENT_NOT_FOUND });
-});
+// Other routes with prefixes
+router.use("/users", userRoutes);
+router.use("/items", itemRoutes);
 
 module.exports = router;
