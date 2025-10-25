@@ -1,7 +1,6 @@
 const { Joi, celebrate } = require("celebrate");
 const validator = require("validator");
 
-// Custom URL validation using validator library
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
     return value;
@@ -9,7 +8,6 @@ const validateURL = (value, helpers) => {
   return helpers.error("string.uri");
 };
 
-// Custom email validation using validator library
 const validateEmail = (value, helpers) => {
   if (validator.isEmail(value)) {
     return value;
@@ -17,7 +15,6 @@ const validateEmail = (value, helpers) => {
   return helpers.error("string.email");
 };
 
-// Custom MongoDB ObjectId validation
 const validateObjectId = (value, helpers) => {
   if (validator.isMongoId(value)) {
     return value;
@@ -25,7 +22,6 @@ const validateObjectId = (value, helpers) => {
   return helpers.error("string.objectId");
 };
 
-// Validation for creating clothing items
 const validateCreateItem = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).messages({
@@ -44,7 +40,6 @@ const validateCreateItem = celebrate({
   }),
 });
 
-// Validation for creating users
 const validateCreateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).messages({
@@ -66,7 +61,6 @@ const validateCreateUser = celebrate({
   }),
 });
 
-// Validation for user login
 const validateUserLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().custom(validateEmail).messages({
@@ -79,7 +73,6 @@ const validateUserLogin = celebrate({
   }),
 });
 
-// Validation for clothing item ID in URL parameters
 const validateItemId = celebrate({
   params: Joi.object().keys({
     itemId: Joi.string().required().custom(validateObjectId).messages({
@@ -89,7 +82,6 @@ const validateItemId = celebrate({
   }),
 });
 
-// Validation for user ID in URL parameters
 const validateUserId = celebrate({
   params: Joi.object().keys({
     userId: Joi.string().required().custom(validateObjectId).messages({

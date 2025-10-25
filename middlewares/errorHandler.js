@@ -1,4 +1,3 @@
-// Custom Error Classes
 class BadRequestError extends Error {
   constructor(message) {
     super(message);
@@ -41,7 +40,7 @@ class InternalServerError extends Error {
   }
 }
 
-// Error Messages Object
+
 const ERROR_MESSAGES = {
   INTERNAL_ERROR: "An error occurred on the server",
   INVALID_DATA: "Invalid data provided",
@@ -51,7 +50,6 @@ const ERROR_MESSAGES = {
   INVALID_ITEM_ID: "Invalid item ID format",
   ITEM_UNAVAILABLE: "This item is currently unavailable for interaction",
 
-  // User-related messages
   ALL_FIELDS_REQUIRED: "All fields are required",
   PASSWORD_TOO_SHORT: "Password must be at least 8 characters",
   EMAIL_EXISTS: "Email already exists",
@@ -60,12 +58,10 @@ const ERROR_MESSAGES = {
   USER_NOT_FOUND: "User not found",
   INVALID_USER_ID: "Invalid user ID",
 
-  // Auth-related messages
   AUTHORIZATION_REQUIRED: "Authorization required",
   INVALID_TOKEN: "Invalid token",
 };
 
-// Error Handler Middleware
 const errorHandler = (err, req, res, next) => {
   console.error(err);
 
@@ -75,7 +71,6 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-// Export everything
 module.exports = {
   errorHandler,
   BadRequestError,
