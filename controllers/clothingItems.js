@@ -1,20 +1,16 @@
 const ClothingItem = require("../models/clothingItem");
 const {
   BadRequestError,
-  UnauthorizedError,
   ForbiddenError,
   NotFoundError,
-  ConflictError,
   InternalServerError,
   ERROR_MESSAGES,
-} = require("../middlewares/errorHandler"); // Get everything from errorHandler
+} = require("../middlewares/errorHandler");
 
 const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch(() => {
-      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
-    });
+    .catch(() => next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR)));
 };
 
 const createItem = (req, res, next) => {
@@ -105,7 +101,7 @@ const dislikeItem = (req, res, next) => {
       if (!item.owner) {
         return next(new BadRequestError(ERROR_MESSAGES.ITEM_UNAVAILABLE));
       }
-      res.status(200).send(item);
+      return res.status(200).send(item);
     })
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {

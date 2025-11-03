@@ -5,10 +5,9 @@ const { ERROR_MESSAGES } = require("../utils/errors");
 const {
   BadRequestError,
   UnauthorizedError,
-  ForbiddenError,
   NotFoundError,
   ConflictError,
-  InternalServerError, // Added this
+  InternalServerError,
 } = require("../middlewares/errorHandler");
 
 const createUser = (req, res, next) => {
@@ -77,9 +76,7 @@ const getCurrentUser = (req, res, next) => {
       }
       return res.json(user);
     })
-    .catch(() => {
-      return next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR));
-    });
+    .catch(() => next(new InternalServerError(ERROR_MESSAGES.INTERNAL_ERROR)));
 };
 
 const updateCurrentUser = (req, res, next) => {
