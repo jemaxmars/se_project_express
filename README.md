@@ -14,7 +14,7 @@ The backend is built with Node.js, Express, and MongoDB, and is designed to work
 - bcryptjs for password hashing
 - Validator for data validation
 - Celebrate for request validation
-- Winston & morgan for logging
+- Winston & joi for logging
 - ESLint (Airbnb-base configuration)
 - Prettier for code formatting
 - PM2 for process management and crash recovery
